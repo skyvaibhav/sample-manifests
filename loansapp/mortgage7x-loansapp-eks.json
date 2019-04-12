@@ -1,0 +1,86 @@
+{
+    "type": "Single-Pool",
+    "status": "Published",
+    "name": "Loans Portal APP",
+    "resourcePool": "mortgage7x.resourcepool.mortgageekskubernetespool",
+    "description": "Loans APP",
+    "application": "mortgage7x.app.loansweb",
+    "environment": "bank7x.environment.development",
+    "services": [
+      {
+        "scalingCount": 0,
+        "configuration": [
+          "mortgage7x.configuration.loansappdb"
+        ],
+        "serviceName": "loans-db-svc",
+        "appService": "mortgage7x.app.loansweb.service.portal-db",
+        "domainName": "loans-db-svc",
+        "dependency": "",
+        "resourcePool": "mortgage7x.resourcepool.mortgageekskubernetespool",
+        "ingress": [
+          {
+            "service": "loans-db-svc",
+            "domain": "cloud.stacklynx.com",
+            "externalUrlEnv": "DB_EXTERNAL_URL",
+            "servicePort": 3306
+          }
+        ],
+        "secrets": [
+          {
+            "secret": "mortgage7x.vault.development.loan-app-secrets",
+            "name": "MYSQL_PASSWORD"
+          }
+        ],
+        "stacks": {
+          "stack": "mortgage7x.catalog.stack.loansportaldb"
+        }
+      },
+      {
+        "scalingCount": 0,
+        "configuration": [
+          "mortgage7x.configuration.loansappapi"
+        ],
+        "serviceName": "loans-api",
+        "appService": "mortgage7x.app.loansweb.service.portal-api",
+        "domainName": "loans-api",
+        "dependency": "loans-db-svc",
+        "resourcePool": "mortgage7x.resourcepool.mortgageekskubernetespool",
+        "ingress": [
+          {
+            "service": "loans-api",
+            "domain": "cloud.stacklynx.com",
+            "externalUrlEnv": "API_BASE_URL",
+            "servicePort": 8080
+          }
+        ],
+        "secrets": [
+          {
+            "secret": "mortgage7x.vault.development.loan-app-secrets",
+            "name": "DB_PASSWORD"
+          }
+        ],
+        "stacks": {
+          "stack": "mortgage7x.catalog.stack.loansportalapi"
+        }
+      },
+      {
+        "scalingCount": 0,
+        "serviceName": "loans-ui",
+        "appService": "mortgage7x.app.loansweb.service.portal-web",
+        "domainName": "loans-ui",
+        "dependency": "loans-api",
+        "resourcePool": "mortgage7x.resourcepool.mortgageekskubernetespool",
+        "ingress": [
+          {
+            "service": "loans-ui",
+            "domain": "cloud.stacklynx.com",
+            "externalUrlEnv": "UI_EXTERNAL_URL",
+            "servicePort": 8080
+          }
+        ],
+        "stacks": {
+          "stack": "mortgage7x.catalog.stack.loansportalweb"
+        }
+      }
+    ]
+  }
